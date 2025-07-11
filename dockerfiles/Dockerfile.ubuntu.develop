@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+FROM ubuntu:24.04
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-venv \
+        python3-pip \
+        python3-setuptools \
+        git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/StaticJinjaPlus
+
+RUN git clone --depth 1 https://github.com/MrDave/StaticJinjaPlus.git \
+    /opt/StaticJinjaPlus \
+    && rm -rf /opt/StaticJinjaPlus/.git
+
+RUN python3.12 -m venv venv && \
+    ./venv/bin/python -m pip install --no-cache-dir -r requirements.txt
+
+ENV PATH="/opt/StaticJinjaPlus/venv/bin:$PATH"
+
+CMD ["python","main.py","--srcpath","templates_example","--outpath","./build"]
